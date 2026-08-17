@@ -1,0 +1,1 @@
+Daily mood tracker/journal app using Python and tkinter for the ui. First attempt at this, aiming to make this for personal use after annoyance using available apps on the app store, riddled with ads and ludicrous payment options.
