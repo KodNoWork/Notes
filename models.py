@@ -15,6 +15,12 @@ class User:
     def change_password(self, new_password):
         self._password = new_password
 
+    def confirm_password(password, confirm_password):
+        if password == confirm_password:
+            return True
+        else:
+            return False
+
     def change_email(self, new_email):
         self._email = new_email
 
