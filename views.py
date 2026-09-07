@@ -1,11 +1,14 @@
 from models import User
 from models import Notes
+from models import center_window as cw
 import tkinter as tk
 
 def main_menu(root):
     for widget in root.winfo_children():
         widget.destroy()
-
+    cw(root)
+    root.focus_force()
+    
     root.title("Reflect")
 
     tk.Label(root, text="Reflect", font=("Helvetica", 24)).pack()

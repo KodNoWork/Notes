@@ -1,5 +1,5 @@
 import os
-import ui as ui
+import views as views
 
 def main():
     pass
