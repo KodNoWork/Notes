@@ -2,19 +2,22 @@ from models import User
 from models import Notes
 from models import viewWindow
 import tkinter as tk
+from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
 
 def main_menu(root):
     for widget in root.winfo_children():
         widget.destroy()
-    root.focus_force()
+    frame = ttk.Frame(root) 
 
+    
     root.title("Reflect")
 
-    tk.Label(root, text="Reflect", font=("Helvetica", 24)).pack()
+    tk.Label(frame, text="Reflect", font=("Helvetica", 24)).pack()
 
-    tk.Button(root, text="Create Account", command=lambda: user_creation(root)).pack()
-    tk.Button(root, text="Login", command=lambda: user_login(root)).pack()
+    tk.Button(frame, text="Create Account", command=lambda: user_creation(root)).pack()
+    tk.Button(frame, text="Login", command=lambda: user_login(root)).pack()
+    frame.pack()
 
 def user_select_menu(root):
     for widget in root.winfo_children():
@@ -32,8 +35,7 @@ def create_journal_entry(root):
     root.title("Create Journal Entry")
 
     noteTitle = tk.Entry(root, width=40).pack()
-    noteTitle.insert(0, "Title")
-    
+
     noteBody = ScrolledText(root, width=40, height=10).pack()
 
 def daily_mood_checkin(root):
@@ -102,5 +104,6 @@ def user_login(root):
 if __name__ == "__main__":
     root = tk.Tk()
     main_menu(root)
-    viewWindow(root).center_window()  # Center the window after it's created
+    viewWindow(root).center_window() # Center the window after it's created
+    root.focus_force()  # Ensure the window is focused
     root.mainloop()
