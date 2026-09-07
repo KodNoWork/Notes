@@ -1,14 +1,14 @@
 from models import User
 from models import Notes
-from models import center_window as cw
+from models import viewWindow
 import tkinter as tk
+from tkinter.scrolledtext import ScrolledText
 
 def main_menu(root):
     for widget in root.winfo_children():
         widget.destroy()
-    cw(root)
     root.focus_force()
-    
+
     root.title("Reflect")
 
     tk.Label(root, text="Reflect", font=("Helvetica", 24)).pack()
@@ -16,6 +16,30 @@ def main_menu(root):
     tk.Button(root, text="Create Account", command=lambda: user_creation(root)).pack()
     tk.Button(root, text="Login", command=lambda: user_login(root)).pack()
 
+def user_select_menu(root):
+    for widget in root.winfo_children():
+        widget.destroy()
+
+    root.title("Private Journal")
+    tk.Label(root, text="Greetings {get_pref_name}!", font=("Helvetica", 18)).pack()
+
+    tk.Button(root, text="Create a New Journal Entry", command=lambda: create_journal_entry(root)).pack()
+    tk.Button(root, text="Daily Mood Check-In", command=lambda: daily_mood_checkin(root)).pack()
+
+def create_journal_entry(root):
+    for widget in root.winfo_children():
+        widget.destroy()
+    root.title("Create Journal Entry")
+
+    noteTitle = tk.Entry(root, width=40).pack()
+    noteTitle.insert(0, "Title")
+    
+    noteBody = ScrolledText(root, width=40, height=10).pack()
+
+def daily_mood_checkin(root):
+    for widget in root.winfo_children():
+        widget.destroy()
+    
 
 def user_creation(root):
     for widget in root.winfo_children():
@@ -60,17 +84,23 @@ def user_creation(root):
         
 
 
-
-
 def user_login(root):
-    username = input("Enter your username: ")
-    password = input("Enter your password: ")
+    tk.Label(root, text="Username:").pack()
+    username_entry = tk.Entry(root)
+    username_entry.pack()
+
+    tk.Label(root, text="Password:").pack()
+    password_entry = tk.Entry(root, show="*")
+    password_entry.pack()
+
     # Here you would typically check the credentials against stored user data
-    print(f"Welcome back, {username}!")
+    print(f"Welcome back, {username_entry.get()}!")
+    user_select_menu(root)
 
 
 
 if __name__ == "__main__":
     root = tk.Tk()
     main_menu(root)
+    viewWindow(root).center_window()  # Center the window after it's created
     root.mainloop()

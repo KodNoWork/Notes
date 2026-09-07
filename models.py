@@ -1,5 +1,9 @@
 
 #Every person using the app will create an account of this class.
+from curses import window
+from turtle import width
+
+
 class User:
     def __init__(self, username,email,pref_name, password):
         self._username = username
@@ -35,14 +39,21 @@ class Notes:
         self._body = body
         self._id = id
 
-    def new_note(self, user_id):
-        user_id._notes.append(self)
+    def new_note(self, body, title):
+        self._notes.append(Notes(title, body, self._id))
+        
 
 
-def center_window(window):
-    window.update_idletasks()
-    width = window.winfo_width()
-    height = window.winfo_height()
-    x = (window.winfo_screenwidth() // 2) - (width // 2)
-    y = (window.winfo_screenheight() // 2) - (height // 2)
-    window.geometry(f'{width}x{height}+{x}+{y}')
+#Centers the tkinter windows fron views on the screen.
+#TODO: Make this happen before the window appears on the screen, not after.
+class viewWindow:
+    def __init__(self, window):
+        self._window = window
+        
+    def center_window(self):
+        self._window.update_idletasks()
+        width = self._window.winfo_width()
+        height = self._window.winfo_height()
+        x = (self._window.winfo_screenwidth() // 2) - (width // 2)
+        y = (self._window.winfo_screenheight() // 2) - (height // 2)
+        self._window.geometry(f'{width}x{height}+{x}+{y}')
