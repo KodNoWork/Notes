@@ -31,6 +31,21 @@ class User:
     def add_note(self, user_id):
         new_note = Notes.new_note(user_id)
 
+    def verify_password(self, password):
+        return self._password == password
+
+
+
+class userService:
+    def __init__(self):
+        self.users = []
+
+    def authenticate_user(self, username, password):
+        for user in self.users:
+            if user._username == username and user.verify_password(password):
+                return user
+        return None
+
 
 #Represents not the journal entries, but the small notes in the daily mood check-in.
 class Notes:

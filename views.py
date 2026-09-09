@@ -1,6 +1,7 @@
 from models import User
 from models import Notes
 from models import viewWindow
+from models import userService as user_service
 import tkinter as tk
 from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
@@ -19,29 +20,29 @@ def main_menu(root):
     tk.Button(frame, text="Login", command=lambda: user_login(root)).pack()
     frame.pack()
 
-def user_select_menu(root):
+def user_select_menu(root, user):
     for widget in root.winfo_children():
         widget.destroy()
 
     root.title("Private Journal")
-    tk.Label(root, text="Greetings {get_pref_name}!", font=("Helvetica", 18)).pack()
+    tk.Label(root, text=f"Greetings {user.get_pref_name()}!", font=("Helvetica", 18)).pack()
 
-    tk.Button(root, text="Create a New Journal Entry", command=lambda: create_journal_entry(root)).pack()
+    tk.Button(root, text="Create a New Journal Entry", command=lambda: create_journal_entry(root, user)).pack()
     tk.Button(root, text="Daily Mood Check-In", command=lambda: daily_mood_checkin(root)).pack()
 
-def create_journal_entry(root):
+def create_journal_entry(root, user):
     for widget in root.winfo_children():
         widget.destroy()
     root.title("Create Journal Entry")
 
-    noteTitle = tk.Entry(root, width=40).pack()
+    note_title = tk.Entry(root, width=40).pack()
 
-    noteBody = ScrolledText(root, width=40, height=10).pack()
+    note_body = ScrolledText(root, width=40, height=10).pack()
 
 def daily_mood_checkin(root):
     for widget in root.winfo_children():
         widget.destroy()
-    
+    root.title("Daily Mood Check-In")
 
 def user_creation(root):
     for widget in root.winfo_children():
@@ -95,9 +96,14 @@ def user_login(root):
     password_entry = tk.Entry(root, show="*")
     password_entry.pack()
 
-    # Here you would typically check the credentials against stored user data
-    print(f"Welcome back, {username_entry.get()}!")
-    user_select_menu(root)
+    user = user_service.authenticate_user(username_entry.get(), password_entry.get())
+
+    if user is not None:
+        user_select_menu(root, user)
+    else:
+        tk.Label(root, text="Invalid username or password. Please try again.", fg="red").pack()
+
+
 
 
 
