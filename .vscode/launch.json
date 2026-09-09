@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Reflect",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/views.py",
+            "cwd": "${workspaceFolder}",
+            "python": "${workspaceFolder}/.venv/bin/python",
+            "envFile": "${workspaceFolder}/.env",
+            "env": {
+                "DATABASE_URL": "postgresql:///reflect"
+            },
+            "console": "integratedTerminal"
+        }
+    ]
+}

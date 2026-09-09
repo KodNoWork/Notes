@@ -1,14 +1,25 @@
 from models import User
 from models import Notes
 from models import viewWindow
-from models import userService as user_service
+from models import userService
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 from tkinter.scrolledtext import ScrolledText
 
-def main_menu(root):
+user_service = userService()
+
+def clear_window(root):
     for widget in root.winfo_children():
         widget.destroy()
+
+def back_button(parent, command):
+    tk.Button(parent, text="<", width=2, command=command).pack(anchor="w", padx=5, pady=5)
+
+
+#Initial UI which appears when the app is opened.
+def main_menu(root):
+    clear_window(root)
     frame = ttk.Frame(root) 
 
     
@@ -19,34 +30,60 @@ def main_menu(root):
     tk.Button(frame, text="Create Account", command=lambda: user_creation(root)).pack()
     tk.Button(frame, text="Login", command=lambda: user_login(root)).pack()
     frame.pack()
+    viewWindow(root).fit_window() 
 
+
+#The main menu the user is going to be on when they are logged in.
 def user_select_menu(root, user):
-    for widget in root.winfo_children():
-        widget.destroy()
+    clear_window(root)
+    back_button(root, lambda: main_menu(root))
+    frame = ttk.Frame(root)
 
     root.title("Private Journal")
-    tk.Label(root, text=f"Greetings {user.get_pref_name()}!", font=("Helvetica", 18)).pack()
+    
+    tk.Label(frame, text=f"Greetings {user.get_pref_name()}!", font=("Helvetica", 18)).pack()
 
-    tk.Button(root, text="Create a New Journal Entry", command=lambda: create_journal_entry(root, user)).pack()
-    tk.Button(root, text="Daily Mood Check-In", command=lambda: daily_mood_checkin(root)).pack()
+    tk.Button(frame, text="Create a New Journal Entry", command=lambda: create_journal_entry(root, user)).pack()
+    tk.Button(frame, text="Daily Mood Check-In", command=lambda: daily_mood_checkin(root, user)).pack()
 
+    tk.Button(frame, text="Logout", command=lambda: main_menu(root)).pack()
+    frame.pack()
+    viewWindow(root).fit_window() 
+
+    
+#The UI for the user to input the details of their journal entry.
 def create_journal_entry(root, user):
-    for widget in root.winfo_children():
-        widget.destroy()
+    clear_window(root)
+    frame = ttk.Frame(root)
     root.title("Create Journal Entry")
+    back_button(frame, lambda: user_select_menu(root, user))
 
-    note_title = tk.Entry(root, width=40).pack()
+    journal_title = tk.Entry(frame, width=40).pack()
 
-    note_body = ScrolledText(root, width=40, height=10).pack()
+    journal_body = ScrolledText(frame, width=40, height=10).pack()
 
-def daily_mood_checkin(root):
-    for widget in root.winfo_children():
-        widget.destroy()
+    tk.Button(frame, text="Save Entry", command=lambda: Notes.new_note(root, user, journal_title.get(), journal_body.get("1.0", tk.END))).pack()
+    frame.pack()
+    viewWindow(root).fit_window() 
+
+
+def view_journal_entries(root, user):
+    clear_window(root)
+    frame = ttk.Frame(root)
+    root.title("View your Journal Entries")
+
+
+
+
+def daily_mood_checkin(root, user):
+    clear_window(root)
     root.title("Daily Mood Check-In")
+    back_button(root, lambda: user_select_menu(root, user))
 
 def user_creation(root):
-    for widget in root.winfo_children():
-        widget.destroy()
+    clear_window(root)
+    root.title("Create Account")
+    back_button(root, lambda: main_menu(root))
 
     tk.Label(root, text="Create Account", font=("Helvetica", 18)).pack()
 
@@ -72,36 +109,49 @@ def user_creation(root):
 
 
     tk.Button(root, text="Create Account", command=lambda: create_account(root, username_entry.get(), email_entry.get(), pref_name_entry.get(), password_entry.get())).pack()
+    viewWindow(root).fit_window() 
 
-
-    #TODO: Implement user having to enter username, email and preferred name aswell. 
-    #TODO: Implement user having an option to return to the mainmenu if they accidentally click create account.
-    #TODO: Do i really need the users email? ig it might be a good idea to have it for account recovery.
     def create_account(root, username, email, pref_name, password):
         if User.confirm_password(password_entry.get(), confirm_password_entry.get()):
             new_user = User(username, email, pref_name, password)
-            print(f"Account created for {new_user._username}!")
+            user_service.add_user(new_user)
+            messagebox.showinfo(
+                "Account created",
+                f"Your user ID is:\n{new_user.user_id}\n\nUse it to log in.",
+            )
             main_menu(root)
+            viewWindow(root).fit_window() 
         else:
             tk.Label(root, text="Passwords do not match. Please try again.", fg="red").pack()
         
 
 
 def user_login(root):
-    tk.Label(root, text="Username:").pack()
-    username_entry = tk.Entry(root)
-    username_entry.pack()
+    clear_window(root)
+    frame = ttk.Frame(root)
+    root.title("Login")
+    back_button(root, lambda: main_menu(root))
 
-    tk.Label(root, text="Password:").pack()
-    password_entry = tk.Entry(root, show="*")
+    tk.Label(frame, text="Email:").pack()
+    email_entry = tk.Entry(frame)
+    email_entry.pack()
+
+    tk.Label(frame, text="Password:").pack()
+    password_entry = tk.Entry(frame, show="*")
     password_entry.pack()
 
-    user = user_service.authenticate_user(username_entry.get(), password_entry.get())
+    def login():
+        email = email_entry.get()
+        password = password_entry.get()
+        user = user_service.authenticate_user(email, password)
+        if user is not None:
+            user_select_menu(root, user)
+        else:
+            tk.Label(root, text="Invalid username or password. Please try again.", fg="red").pack()
 
-    if user is not None:
-        user_select_menu(root, user)
-    else:
-        tk.Label(root, text="Invalid username or password. Please try again.", fg="red").pack()
+    tk.Button(frame, text="Login", command=login).pack()
+    frame.pack()
+    viewWindow(root).fit_window() 
 
 
 
@@ -110,6 +160,7 @@ def user_login(root):
 if __name__ == "__main__":
     root = tk.Tk()
     main_menu(root)
+    viewWindow(root).fit_window()  # Fit the window to its content
     viewWindow(root).center_window() # Center the window after it's created
     root.focus_force()  # Ensure the window is focused
     root.mainloop()
