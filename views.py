@@ -7,6 +7,7 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter.scrolledtext import ScrolledText
 
+
 user_service = userService()
 
 def clear_window(root):
@@ -22,15 +23,15 @@ def main_menu(root):
     clear_window(root)
     frame = ttk.Frame(root) 
 
-    
+
     root.title("Reflect")
 
     tk.Label(frame, text="Reflect", font=("Helvetica", 24)).pack()
 
-    tk.Button(frame, text="Create Account", command=lambda: user_creation(root)).pack()
     tk.Button(frame, text="Login", command=lambda: user_login(root)).pack()
+    tk.Button(frame, text="Create Account", command=lambda: user_creation(root)).pack()
+    
     frame.pack()
-    viewWindow(root).fit_window() 
 
 
 #The main menu the user is going to be on when they are logged in.
@@ -48,10 +49,10 @@ def user_select_menu(root, user):
 
     tk.Button(frame, text="Logout", command=lambda: main_menu(root)).pack()
     frame.pack()
-    viewWindow(root).fit_window() 
+
 
     
-#The UI for the user to input the details of their journal entry.
+#The UI for the user to input the details of their journal entry. User can access this view from the user_select_menu view.
 def create_journal_entry(root, user):
     clear_window(root)
     frame = ttk.Frame(root)
@@ -64,7 +65,7 @@ def create_journal_entry(root, user):
 
     tk.Button(frame, text="Save Entry", command=lambda: Notes.new_note(root, user, journal_title.get(), journal_body.get("1.0", tk.END))).pack()
     frame.pack()
-    viewWindow(root).fit_window() 
+
 
 
 def view_journal_entries(root, user):
@@ -109,7 +110,6 @@ def user_creation(root):
 
 
     tk.Button(root, text="Create Account", command=lambda: create_account(root, username_entry.get(), email_entry.get(), pref_name_entry.get(), password_entry.get())).pack()
-    viewWindow(root).fit_window() 
 
     def create_account(root, username, email, pref_name, password):
         if User.confirm_password(password_entry.get(), confirm_password_entry.get()):
@@ -120,7 +120,6 @@ def user_creation(root):
                 f"Your user ID is:\n{new_user.user_id}\n\nUse it to log in.",
             )
             main_menu(root)
-            viewWindow(root).fit_window() 
         else:
             tk.Label(root, text="Passwords do not match. Please try again.", fg="red").pack()
         
@@ -151,7 +150,6 @@ def user_login(root):
 
     tk.Button(frame, text="Login", command=login).pack()
     frame.pack()
-    viewWindow(root).fit_window() 
 
 
 
@@ -160,7 +158,8 @@ def user_login(root):
 if __name__ == "__main__":
     root = tk.Tk()
     main_menu(root)
-    viewWindow(root).fit_window()  # Fit the window to its content
+    #viewWindow(root).fit_window()  # Fit the window to its content
+    viewWindow(root)._window.geometry("1200x700")  # Set a default size for the window
     viewWindow(root).center_window() # Center the window after it's created
     root.focus_force()  # Ensure the window is focused
     root.mainloop()

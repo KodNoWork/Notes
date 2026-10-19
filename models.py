@@ -1,8 +1,8 @@
 
 import os
 import bcrypt
-import psycopg
 from uuid import uuid4
+import sqlite3 as sqlite
 
 
 class User:
@@ -53,60 +53,16 @@ class User:
 
 class userService:
     def __init__(self):
-        self.database_url = os.getenv("DATABASE_URL")
-        if not self.database_url:
-            raise RuntimeError(
-                "DATABASE_URL is not set. Configure it before starting the app, "
-                "for example: postgresql://postgres:password@localhost:5432/reflect"
-            )
-        self.create_users_table()
+        self.conn = sqlite.connect("journal_data/users.db")
+        self.cursor = self.conn.cursor()
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS users
+                               (user_id TEXT PRIMARY KEY,
+                                username TEXT,
+                                email TEXT,
+                                pref_name TEXT,
+                                password_hash TEXT)''')
+        self.conn.commit()
 
-    def add_user(self, user):
-        with psycopg.connect(self.database_url) as connection:
-            connection.execute(
-                """
-                INSERT INTO users (user_id, username, email, pref_name, password_hash)
-                VALUES (%s, %s, %s, %s, %s)
-                """,
-                (
-                    user.user_id,
-                    user.username,
-                    user.email,
-                    user.pref_name,
-                    user.password_hash.decode("utf-8"),
-                ),
-            )
-
-    def authenticate_user(self, email, password):
-        with psycopg.connect(self.database_url) as connection:
-            row = connection.execute(
-                """
-                SELECT user_id, username, email, pref_name, password_hash
-                FROM users
-                WHERE email = %s
-                """,
-                (email,),
-            ).fetchone()
-
-        if row is None:
-            return None
-
-        user = User.from_database(*row)
-        return user if user.verify_password(password) else None
-
-    def create_users_table(self):
-        with psycopg.connect(self.database_url) as connection:
-            connection.execute(
-                """
-                CREATE TABLE IF NOT EXISTS users (
-                    user_id UUID PRIMARY KEY,
-                    username TEXT NOT NULL UNIQUE,
-                    email TEXT NOT NULL UNIQUE,
-                    pref_name TEXT NOT NULL,
-                    password_hash TEXT NOT NULL
-                )
-                """
-            )
 
 
 #Represents not the journal entries, but the small notes in the daily mood check-in.
@@ -135,9 +91,10 @@ class viewWindow:
         y = (self._window.winfo_screenheight() // 2) - (height // 2)
         self._window.geometry(f'{width}x{height}+{x}+{y}')
 
-    def fit_window(self):
+    """ def fit_window(self):
         self._window.update_idletasks()
         width = self._window.winfo_reqwidth()
         height = self._window.winfo_reqheight()
         self._window.geometry(f'{width}x{height}')
-        self._window.minsize(width, height)
+        self._window.minsize(width, height) """
+  

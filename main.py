@@ -1,5 +1,9 @@
 import os
 import views as views
+import tkinter as tk
 
 def main():
-    pass
+    os.mkdir("journal_data") if not os.path.exists("journal_data") else None
+    
+
+
