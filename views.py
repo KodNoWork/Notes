@@ -1,5 +1,5 @@
 from models import User
-from models import Notes
+from models import Note
 from models import viewWindow
 from models import userService
 import tkinter as tk
@@ -9,6 +9,14 @@ from tkinter.scrolledtext import ScrolledText
 
 
 user_service = userService()
+
+def window_init():
+    root = tk.Tk()
+    main_menu(root)
+    viewWindow(root)._window.geometry("1200x700")  # Set a default size for the window
+    viewWindow(root).center_window() # Center the window after it's created
+    root.focus_force()  # Ensure the window is focused
+    root.mainloop()
 
 def clear_window(root):
     for widget in root.winfo_children():
@@ -63,7 +71,7 @@ def create_journal_entry(root, user):
 
     journal_body = ScrolledText(frame, width=40, height=10).pack()
 
-    tk.Button(frame, text="Save Entry", command=lambda: Notes.new_note(root, user, journal_title.get(), journal_body.get("1.0", tk.END))).pack()
+    tk.Button(frame, text="Save Entry", command=lambda: Note.new_note(root, user, journal_title.get(), journal_body.get("1.0", tk.END))).pack()
     frame.pack()
 
 

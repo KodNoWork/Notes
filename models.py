@@ -1,8 +1,8 @@
-
-import os
+import os as os
 import bcrypt
 from uuid import uuid4
 import sqlite3 as sqlite
+
 
 
 class User:
@@ -44,7 +44,7 @@ class User:
         self.email = new_email
 
     def add_note(self, user_id):
-        new_note = Notes.new_note(user_id)
+        new_note = Note.new_note(user_id)
 
     def verify_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash)
@@ -53,7 +53,8 @@ class User:
 
 class userService:
     def __init__(self):
-        self.conn = sqlite.connect("journal_data/users.db")
+        os.chdir("/home/filip/Documents/journal_data") if os.path.exists("/home/filip/Documents/journal_data") else os.mkdir("/home/filip/Documents/journal_data")
+        self.conn = sqlite.connect("/home/filip/Documents/journal_data/users.db")
         self.cursor = self.conn.cursor()
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS users
                                (user_id TEXT PRIMARY KEY,
@@ -63,20 +64,20 @@ class userService:
                                 password_hash TEXT)''')
         self.conn.commit()
 
+    def add_user(self, user):
+        pass
 
 
 #Represents not the journal entries, but the small notes in the daily mood check-in.
-class Notes:
+class Note:
     def __init__(self, title, body,id):
         self._title = title
         self._body = body
         self._id = id
-
+    
     def new_note(self,user, body, title):
-        user.notes.append(Notes(title, body, self._id))
+        user.notes.append(Note(title, body, self._id))
         
-
-
 #Centers the tkinter windows fron views on the screen.
 #TODO: Make this happen before the window appears on the screen, not after.
 class viewWindow:
@@ -91,10 +92,4 @@ class viewWindow:
         y = (self._window.winfo_screenheight() // 2) - (height // 2)
         self._window.geometry(f'{width}x{height}+{x}+{y}')
 
-    """ def fit_window(self):
-        self._window.update_idletasks()
-        width = self._window.winfo_reqwidth()
-        height = self._window.winfo_reqheight()
-        self._window.geometry(f'{width}x{height}')
-        self._window.minsize(width, height) """
   
