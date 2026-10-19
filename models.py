@@ -24,8 +24,7 @@ class User:
         user.username = username
         user.email = email
         user.pref_name = pref_name
-        user.password_hash = password_hash.encode("utf-8")
-        user.notes = []
+        user.password_hash = password_hash.encode('utf-8') if isinstance(password_hash, str) else password_hash
         return user
 
     def change_username(self, new_username):
@@ -65,7 +64,18 @@ class userService:
         self.conn.commit()
 
     def add_user(self, user):
-        pass
+        self.cursor.execute('''INSERT INTO users (user_id, username, email, pref_name, password_hash)
+                               VALUES (?, ?, ?, ?, ?)''', (user.user_id, user.username, user.email, user.pref_name, user.password_hash))
+        self.conn.commit()
+
+    def authenticate_user(self, username, password):
+        self.cursor.execute('''SELECT * FROM users WHERE username = ?''', (username,))
+        user_data = self.cursor.fetchone()
+        if user_data:
+            user = User.from_database(*user_data)
+            if user.verify_password(password):
+                return user
+        return None
 
 
 #Represents not the journal entries, but the small notes in the daily mood check-in.
