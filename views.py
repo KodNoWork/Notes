@@ -1,11 +1,13 @@
+import tkinter
+from tkinter import messagebox
+
 from models import User
 from models import Note
 from models import viewWindow
 from models import userService
 import tkinter as tk
 from tkinter import ttk
-from tkinter import messagebox
-from tkinter.scrolledtext import ScrolledText
+from tkinter import scrolledtext
 
 
 user_service = userService()
@@ -36,9 +38,12 @@ def main_menu(root):
 
     tk.Label(frame, text="Reflect", font=("Helvetica", 24)).pack()
 
-    tk.Button(frame, text="Login", command=lambda: user_login(root)).pack()
-    tk.Button(frame, text="Create Account", command=lambda: user_creation(root)).pack()
-    
+    login_btn = tk.Button(frame, text="Login", command=lambda: user_login(root))
+    login_btn.focus()
+    create_account_btn = tk.Button(frame, text="Create Account", command=lambda: user_creation(root))
+
+    login_btn.pack(pady=10)
+    create_account_btn.pack(pady=10)
     frame.pack()
 
 
@@ -62,16 +67,22 @@ def user_select_menu(root, user):
     
 #The UI for the user to input the details of their journal entry. User can access this view from the user_select_menu view.
 def create_journal_entry(root, user):
+    title_var = tk.StringVar()
     clear_window(root)
     frame = ttk.Frame(root)
     root.title("Create Journal Entry")
     back_button(frame, lambda: user_select_menu(root, user))
 
-    journal_title = tk.Entry(frame, width=40).pack()
+    journal_title = tk.Entry(frame, width=40, textvariable=title_var)
+    journal_title.focus()
 
-    journal_body = ScrolledText(frame, width=40, height=10).pack()
+    journal_body = scrolledtext.ScrolledText(frame, width=40, height=10)
 
-    tk.Button(frame, text="Save Entry", command=lambda: Note.new_note(root, user, journal_title.get(), journal_body.get("1.0", tk.END))).pack()
+    tk.Button(frame, text="Save Entry", command=lambda: Note.new_note(user, journal_title.get(), 
+                                                                      journal_body.get("1.0", tk.END))).pack()
+
+    journal_title.pack(pady=5)
+    journal_body.pack(pady=5)
     frame.pack()
 
 

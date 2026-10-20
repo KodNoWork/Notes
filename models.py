@@ -42,8 +42,9 @@ class User:
     def change_email(self, new_email):
         self.email = new_email
 
-    def add_note(self, user_id):
-        new_note = Note.new_note(user_id)
+    def add_note(self, user, title, body):
+        user.notes.append(Note(title, body, str(uuid4())))
+        
 
     def verify_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash)
@@ -68,8 +69,8 @@ class userService:
                                VALUES (?, ?, ?, ?, ?)''', (user.user_id, user.username, user.email, user.pref_name, user.password_hash))
         self.conn.commit()
 
-    def authenticate_user(self, username, password):
-        self.cursor.execute('''SELECT * FROM users WHERE username = ?''', (username,))
+    def authenticate_user(self, email, password):
+        self.cursor.execute('''SELECT * FROM users WHERE email = ?''', (email,))
         user_data = self.cursor.fetchone()
         if user_data:
             user = User.from_database(*user_data)
@@ -85,8 +86,8 @@ class Note:
         self._body = body
         self._id = id
     
-    def new_note(self,user, body, title):
-        user.notes.append(Note(title, body, self._id))
+    def new_note(user, title,body):
+        user.add_note(user, title, body)
         
 #Centers the tkinter windows fron views on the screen.
 #TODO: Make this happen before the window appears on the screen, not after.
