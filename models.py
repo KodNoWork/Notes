@@ -42,13 +42,15 @@ class User:
     def change_email(self, new_email):
         self.email = new_email
 
-    def add_note(self, user, title, body):
-        user.notes.append(Note(title, body, str(uuid4())))
+    def add_note(self, title, body):
+        self.notes.append(Note(title, body, len(self.notes) + 1))   
         
 
     def verify_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash)
 
+    def identify_user_by_id(self, user_id):
+        return self.user_id == user_id
 
 
 class userService:
@@ -86,8 +88,8 @@ class Note:
         self._body = body
         self._id = id
     
-    def new_note(user, title,body):
-        user.add_note(user, title, body)
+    def new_note(user_id,title,body):
+        user_id.add_note(title, body)
         
 #Centers the tkinter windows fron views on the screen.
 #TODO: Make this happen before the window appears on the screen, not after.

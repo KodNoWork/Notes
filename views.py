@@ -58,6 +58,7 @@ def user_select_menu(root, user):
     tk.Label(frame, text=f"Greetings {user.get_pref_name()}!", font=("Helvetica", 18)).pack()
 
     tk.Button(frame, text="Create a New Journal Entry", command=lambda: create_journal_entry(root, user)).pack()
+    tk.Button(frame, text="View your Journal Entries", command=lambda: view_journal_entries(root, user)).pack()
     tk.Button(frame, text="Daily Mood Check-In", command=lambda: daily_mood_checkin(root, user)).pack()
 
     tk.Button(frame, text="Logout", command=lambda: main_menu(root)).pack()
@@ -152,6 +153,7 @@ def user_login(root):
 
     tk.Label(frame, text="Email:").pack()
     email_entry = tk.Entry(frame)
+    email_entry.focus()
     email_entry.pack()
 
     tk.Label(frame, text="Password:").pack()
