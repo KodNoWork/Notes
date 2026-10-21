@@ -79,8 +79,7 @@ def create_journal_entry(root, user):
 
     journal_body = scrolledtext.ScrolledText(frame, width=40, height=10)
 
-    tk.Button(frame, text="Save Entry", command=lambda: Note.new_note(user, journal_title.get(), 
-                                                                      journal_body.get("1.0", tk.END))).pack()
+    tk.Button(frame, text="Save Entry", command=lambda: Note.new_note(Note(user, journal_title.get(), journal_body.get("1.0", tk.END), None), user.get_user_id())).pack()
 
     journal_title.pack(pady=5)
     journal_body.pack(pady=5)
@@ -92,6 +91,12 @@ def view_journal_entries(root, user):
     clear_window(root)
     frame = ttk.Frame(root)
     root.title("View your Journal Entries")
+    back_button(frame, lambda: user_select_menu(root, user))
+    journal_listbox = tk.Listbox(frame, width=50, height=10)
+    for entry in user.get_user_entries():
+        journal_listbox.insert(tk.END, f"{entry._title}")
+    journal_listbox.pack(pady=5)
+    frame.pack()
 
 
 

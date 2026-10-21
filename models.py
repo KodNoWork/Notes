@@ -12,19 +12,27 @@ class User:
         self.email = email
         self.pref_name = pref_name
         self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-        self.notes = []
-
+        self.journal_entries = []
+        
     def get_pref_name(self):
         return self.pref_name
 
+    def get_user_id(self):
+        return self.user_id
+
+    def get_user_entries(self):
+        Note.get_entries(self.user_id)
+        
+
     @classmethod
-    def from_database(cls, user_id, username, email, pref_name, password_hash):
+    def from_database(cls, user_id, username, email, pref_name,journal_entries, password_hash):
         user = cls.__new__(cls)
         user.user_id = str(user_id)
         user.username = username
         user.email = email
         user.pref_name = pref_name
         user.password_hash = password_hash.encode('utf-8') if isinstance(password_hash, str) else password_hash
+        user.journal_entries = journal_entries
         return user
 
     def change_username(self, new_username):
@@ -43,7 +51,7 @@ class User:
         self.email = new_email
 
     def add_note(self, title, body):
-        self.notes.append(Note(title, body, len(self.notes) + 1))   
+        self.journal_entries.append(Note(title, body, len(self.journal_entries) + 1))   
         
 
     def verify_password(self, password):
@@ -83,14 +91,36 @@ class userService:
 
 #Represents not the journal entries, but the small notes in the daily mood check-in.
 class Note:
-    def __init__(self, title, body,id):
+    def __init__(self, user, title, body,id):
+        self._user = user
         self._title = title
         self._body = body
         self._id = id
+        os.chdir("/home/filip/Documents/journal_data") if os.path.exists("/home/filip/Documents/journal_data") else os.mkdir("/home/filip/Documents/journal_data")
+        self.conn = sqlite.connect("/home/filip/Documents/journal_data/entries.db")
+        self.cursor = self.conn.cursor()
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS entries
+                               (user_id TEXT REFERENCES users(user_id),
+                                title TEXT,
+                                body TEXT,
+                                id INTEGER)''')
+        self.conn.commit()
     
-    def new_note(user_id,title,body):
-        user_id.add_note(title, body)
-        
+    def new_note(self):
+        #user_id.add_note(title, body, len(user.journal_entries))
+        self.cursor.execute('''INSERT INTO entries (user_id, title, body, id)
+                               VALUES (?, ?, ?, ?)''', (self._user.get_user_id(), self._title, self._body, self._id))
+        self.conn.commit()
+
+    def get_entries(self, user_id):
+        self.cursor.execute('''SELECT * FROM entries WHERE user_id = ?''', (user_id,))
+        entries_data = self.cursor.fetchall()
+        entries = []
+        for entry_data in entries_data:
+            entry = Note(self._user, entry_data[1], entry_data[2], entry_data[3])
+            entries.append(entry)
+        return entries
+    
 #Centers the tkinter windows fron views on the screen.
 #TODO: Make this happen before the window appears on the screen, not after.
 class viewWindow:
