@@ -21,9 +21,8 @@ class User:
         return self.user_id
 
     def get_user_entries(self):
-        Note.get_entries(self.user_id)
-        
-
+        return Note.get_entries(Note,self)
+    
     @classmethod
     def from_database(cls, user_id, username, email, pref_name,journal_entries, password_hash):
         user = cls.__new__(cls)
@@ -53,7 +52,6 @@ class User:
     def add_note(self, title, body):
         self.journal_entries.append(Note(title, body, len(self.journal_entries) + 1))   
         
-
     def verify_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash)
 
@@ -106,20 +104,22 @@ class Note:
                                 id INTEGER)''')
         self.conn.commit()
     
-    def new_note(self):
+    def new_note(self, user_id):
         #user_id.add_note(title, body, len(user.journal_entries))
         self.cursor.execute('''INSERT INTO entries (user_id, title, body, id)
-                               VALUES (?, ?, ?, ?)''', (self._user.get_user_id(), self._title, self._body, self._id))
+                               VALUES (?, ?, ?, ?)''', (user_id, self._title, self._body, self._id))
         self.conn.commit()
 
-    def get_entries(self, user_id):
-        self.cursor.execute('''SELECT * FROM entries WHERE user_id = ?''', (user_id,))
-        entries_data = self.cursor.fetchall()
-        entries = []
-        for entry_data in entries_data:
-            entry = Note(self._user, entry_data[1], entry_data[2], entry_data[3])
-            entries.append(entry)
-        return entries
+    def get_entries(self,user):
+        with sqlite.connect("/home/filip/Documents/journal_data/entries.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute('''SELECT title,body FROM entries WHERE user_id = ?''', (user.get_user_id(),))
+            entries_data = cursor.fetchall()
+            entries = []
+            for entry_data in entries_data:
+                entries.append(entry_data)
+            return entries
+
     
 #Centers the tkinter windows fron views on the screen.
 #TODO: Make this happen before the window appears on the screen, not after.

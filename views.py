@@ -94,10 +94,20 @@ def view_journal_entries(root, user):
     back_button(frame, lambda: user_select_menu(root, user))
     journal_listbox = tk.Listbox(frame, width=50, height=10)
     for entry in user.get_user_entries():
-        journal_listbox.insert(tk.END, f"{entry._title}")
+        journal_listbox.insert(tk.END, f"{entry[0]}: {entry[1][:30]}...")  # Display title and first 30 characters of body
     journal_listbox.pack(pady=5)
     frame.pack()
 
+def view_journal_entry_detail(root, user, entry):
+    clear_window(root)
+    frame = ttk.Frame(root)
+    root.title(f"entry[0]")
+
+    entry_title = tk.Label(frame, text=f"Title: {entry[0]}", font=("Helvetica", 14))
+
+    entry_title.pack(pady=5)
+
+    frame.pack()
 
 
 
