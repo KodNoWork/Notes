@@ -1,6 +1,6 @@
 import os as os
 import bcrypt
-from uuid import uuid4
+from uuid import main, uuid4
 import sqlite3 as sqlite
 
 
@@ -61,8 +61,8 @@ class User:
 
 class userService:
     def __init__(self):
-        os.chdir("/home/filip/Documents/journal_data") if os.path.exists("/home/filip/Documents/journal_data") else os.mkdir("/home/filip/Documents/journal_data")
-        self.conn = sqlite.connect("/home/filip/Documents/journal_data/users.db")
+        os.chdir(journal_path) if os.path.exists(journal_path) else os.mkdir(journal_path)
+        self.conn = sqlite.connect(journal_path / "users.db")
         self.cursor = self.conn.cursor()
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS users
                                (user_id TEXT PRIMARY KEY,
@@ -94,8 +94,8 @@ class Note:
         self._title = title
         self._body = body
         self._id = id
-        os.chdir("/home/filip/Documents/journal_data") if os.path.exists("/home/filip/Documents/journal_data") else os.mkdir("/home/filip/Documents/journal_data")
-        self.conn = sqlite.connect("/home/filip/Documents/journal_data/entries.db")
+        os.chdir(journal_path) if os.path.exists(journal_path) else os.mkdir(journal_path)
+        self.conn = sqlite.connect(journal_path / "entries.db")
         self.cursor = self.conn.cursor()
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS entries
                                (user_id TEXT REFERENCES users(user_id),
@@ -103,6 +103,10 @@ class Note:
                                 body TEXT,
                                 id INTEGER)''')
         self.conn.commit()
+
+    def get_directory(path):
+        conn = sqlite.connect(path / "entries.db")
+        return conn
     
     def new_note(self, user_id):
         #user_id.add_note(title, body, len(user.journal_entries))
@@ -111,7 +115,9 @@ class Note:
         self.conn.commit()
 
     def get_entries(self,user):
-        with sqlite.connect("/home/filip/Documents/journal_data/entries.db") as conn:
+        conn = sqlite.connect(journal_path / "entries.db")
+        
+        with sqlite.connect(journal_path / "entries.db") as conn:
             cursor = conn.cursor()
             cursor.execute('''SELECT title,body FROM entries WHERE user_id = ?''', (user.get_user_id(),))
             entries_data = cursor.fetchall()
