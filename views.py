@@ -78,8 +78,10 @@ def create_journal_entry(root, user):
 
     journal_body = scrolledtext.ScrolledText(frame, width=40, height=10)
 
-    tk.Button(frame, text="Save Entry", command=lambda: Note.new_note(Note(user, journal_title.get(), journal_body.get("1.0", tk.END), None), user.get_user_id())).pack()
-
+    save_btn = tk.Button(frame, text="Save Entry", command=lambda: Note.new_note(Note(user, journal_title.get(), journal_body.get("1.0", tk.END), None), user.get_user_id())).pack()
+    if user.check_if_note_exists():
+        messagebox.showinfo("Entry Saved", "Your journal entry has been saved successfully.", fg="green")
+        user_select_menu(root, user)
     journal_title.pack(pady=5)
     journal_body.pack(pady=5)
     frame.pack()
@@ -145,6 +147,8 @@ def user_creation(root):
 
     tk.Button(root, text="Create Account", command=lambda: create_account(root, username_entry.get(), email_entry.get(), pref_name_entry.get(), password_entry.get())).pack()
 
+
+# UI Which handles account creation, passes the user input to the user service to create a new instance of User and add it to the db.
     def create_account(root, username, email, pref_name, password):
         if User.confirm_password(password_entry.get(), confirm_password_entry.get()):
             new_user = User(username, email, pref_name, password)
@@ -160,6 +164,7 @@ def user_creation(root):
         
 
 
+# The UI that displays when the user presses login, passes email and password entered by the user to the user_service for authentication.
 def user_login(root):
     clear_window(root)
     frame = ttk.Frame(root)

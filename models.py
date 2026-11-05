@@ -37,16 +37,18 @@ class User:
 
     def get_user_entries(self):
         return Note.get_entries(Note,self)
-    
+
+    def check_if_note_exists(self, title, note_id):
+        return Note.authenticate_note_addition(Note(self, title, None, None), self.user_id, note_id)
+
     @classmethod
-    def from_database(cls, user_id, username, email, pref_name,journal_entries, password_hash):
+    def from_database(cls, user_id, username, email, pref_name, password_hash):
         user = cls.__new__(cls)
         user.user_id = str(user_id)
         user.username = username
         user.email = email
         user.pref_name = pref_name
         user.password_hash = password_hash.encode('utf-8') if isinstance(password_hash, str) else password_hash
-        user.journal_entries = journal_entries
         return user
 
     def change_username(self, new_username):
@@ -126,6 +128,13 @@ class Note:
     def get_directory(path):
         conn = sqlite.connect(path / "entries.db")
         return conn
+
+    def authenticate_note_addition(self, user_id, note_id):
+        self.cursor.execute('''SELECT * FROM entries WHERE user_id = ? AND id = ?''', (user_id, note_id))
+        note_data = self.cursor.fetchone()
+        if note_data:
+            return True
+        return False
     
     def new_note(self, user_id):
         #user_id.add_note(title, body, len(user.journal_entries))
