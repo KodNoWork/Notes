@@ -4,13 +4,12 @@ from tkinter import messagebox
 from models import User
 from models import Note
 from models import viewWindow
-from models import userService
+from models import get_user_service
 import tkinter as tk
 from tkinter import ttk
 from tkinter import scrolledtext
 
 
-user_service = userService()
 
 def window_init():
     root = tk.Tk()
@@ -149,6 +148,7 @@ def user_creation(root):
     def create_account(root, username, email, pref_name, password):
         if User.confirm_password(password_entry.get(), confirm_password_entry.get()):
             new_user = User(username, email, pref_name, password)
+            user_service = get_user_service()
             user_service.add_user(new_user)
             messagebox.showinfo(
                 "Account created",
@@ -178,6 +178,7 @@ def user_login(root):
     def login():
         email = email_entry.get()
         password = password_entry.get()
+        user_service = get_user_service()
         user = user_service.authenticate_user(email, password)
         if user is not None:
             user_select_menu(root, user)

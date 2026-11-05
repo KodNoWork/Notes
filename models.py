@@ -4,6 +4,21 @@ from uuid import main, uuid4
 import sqlite3 as sqlite
 
 
+def set_journal_path(path):
+    global journal_path
+    journal_path = path
+
+def get_journal_path():
+    return journal_path
+
+def set_user_service(service):
+    global user_service
+    user_service = service
+    
+def get_user_service():
+    return user_service
+
+
 
 class User:
     def __init__(self, username,email,pref_name, password):
@@ -61,6 +76,7 @@ class User:
 
 class userService:
     def __init__(self):
+        journal_path = get_journal_path()
         os.chdir(journal_path) if os.path.exists(journal_path) else os.mkdir(journal_path)
         self.conn = sqlite.connect(journal_path / "users.db")
         self.cursor = self.conn.cursor()
@@ -71,6 +87,8 @@ class userService:
                                 pref_name TEXT,
                                 password_hash TEXT)''')
         self.conn.commit()
+
+
 
     def add_user(self, user):
         self.cursor.execute('''INSERT INTO users (user_id, username, email, pref_name, password_hash)
@@ -90,6 +108,7 @@ class userService:
 #Represents not the journal entries, but the small notes in the daily mood check-in.
 class Note:
     def __init__(self, user, title, body,id):
+        journal_path = get_journal_path()
         self._user = user
         self._title = title
         self._body = body
