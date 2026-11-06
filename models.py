@@ -112,7 +112,7 @@ class Note:
         self._user = user
         self._title = title
         self._body = body
-        self._id = id
+        self._id = str(uuid4()) if id is None else id
         os.chdir(journal_path) if os.path.exists(journal_path) else os.mkdir(journal_path)
         self.conn = sqlite.connect(journal_path / "entries.db")
         self.cursor = self.conn.cursor()
@@ -120,7 +120,7 @@ class Note:
                                (user_id TEXT REFERENCES users(user_id),
                                 title TEXT,
                                 body TEXT,
-                                id INTEGER)''')
+                                id TEXT PRIMARY KEY)''')
         self.conn.commit()
 
     def get_directory(path):
