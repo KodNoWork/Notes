@@ -13,7 +13,7 @@ Create a local database, then set its connection string before starting the app:
 ```bash
 sudo -u postgres createdb reflect
 export DATABASE_URL="postgresql://postgres:your_password@localhost:5432/reflect"
-python views.py
+python main.py
 ```
 
 The app creates the `users` table automatically. Passwords are stored as bcrypt

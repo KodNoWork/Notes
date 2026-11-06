@@ -26,6 +26,10 @@ def clear_window(root):
 def back_button(parent, command):
     tk.Button(parent, text="<", width=2, command=command).pack(anchor="w", padx=5, pady=5)
 
+def success_message(button):
+    messagebox.showinfo("Success", "Your journal entry has been saved successfully.", fg="green")
+    button.master.destroy()  # Close the current window after showing the message
+
 
 #Initial UI which appears when the app is opened.
 def main_menu(root):
@@ -79,9 +83,8 @@ def create_journal_entry(root, user):
     journal_body = scrolledtext.ScrolledText(frame, width=40, height=10)
 
     save_btn = tk.Button(frame, text="Save Entry", command=lambda: Note.new_note(Note(user, journal_title.get(), journal_body.get("1.0", tk.END), None), user.get_user_id())).pack()
-    if user.check_if_note_exists():
-        messagebox.showinfo("Entry Saved", "Your journal entry has been saved successfully.", fg="green")
-        user_select_menu(root, user)
+    if save_btn:
+        success_message(save_btn)        
     journal_title.pack(pady=5)
     journal_body.pack(pady=5)
     frame.pack()
